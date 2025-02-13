@@ -74,9 +74,13 @@ WSGI_APPLICATION = 'user_auth.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+     'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'defaultdb',
+        'USER': 'avnadmin', 
+        'PASSWORD': 'AVNS_LJfu-uwOZzhjWJGlmVO',
+        'HOST': 'belltower-2025-belltower-2025.g.aivencloud.com',
+        'PORT': '12608',
     }
 }
 
