@@ -1,5 +1,5 @@
 """
-ASGI config for user_auth project.
+ASGI config for tcd_social project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'user_auth.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tcd_social.settings')
 
 application = get_asgi_application()
