@@ -75,7 +75,7 @@ WSGI_APPLICATION = 'tcd_social.wsgi.application'
 
 DATABASES = {
      'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'defaultdb',
         'USER': 'avnadmin', 
         'PASSWORD': 'AVNS_LJfu-uwOZzhjWJGlmVO',
