@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'posts',
+    'user_auth',  # Add the user_auth app
 ]
 
 MIDDLEWARE = [
@@ -105,6 +106,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Set the custom user model
+AUTH_USER_MODEL = 'user_auth.User'
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
