@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_http_methods
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import get_user_model
@@ -49,6 +50,22 @@ def register_user(request):
         return JsonResponse({'error': f'Missing required field: {str(e)}'}, status=400)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
+    
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def login_user(request):
+    """Authenticate and log in a user"""
+    try:
+        data = json.loads(request.body)
+        user = authenticate(request, email=data.get('email'), password=data.get('password'))
+        if user is not None:
+            login(request, user)
+            return JsonResponse({'message': 'Login successful'})
+        else:
+            return JsonResponse({'error': 'Invalid credentials'}, status=401)
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON format'}, status=400)
 
 @require_http_methods(["GET"])
 def list_users(request):
