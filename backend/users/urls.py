@@ -9,10 +9,11 @@ urlpatterns = [
     
     # User registration and management
     path('register/', views.register_user, name='register'),
-    path('users/', views.list_users, name='list_users'),
-    path('users/<int:user_id>/', views.get_user, name='get_user'),
-    path('users/<int:user_id>/update/', views.update_user, name='update_user'),
-    path('users/<int:user_id>/delete/', views.delete_user, name='delete_user'),
+    path('login/', views.login_user, name='login'),
+    path('list/', views.list_users, name='list_users'),
+    path('<int:user_id>/', views.get_user, name='get_user'),
+    path('<int:user_id>/update/', views.update_user, name='update_user'),
+    path('<int:user_id>/delete/', views.delete_user, name='delete_user'),
     
     # User profile
     path('profile/', views.get_my_profile, name='my_profile'),
