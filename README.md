@@ -6,7 +6,7 @@ This is the Django back-end of the application. The react.js-based front-end han
 
 We are using a postgreSQL database which is hosted on Aiven Cloud. Data regarding Users information and posts are stored here. <br>
 
-We are also using Firebase for authentication using their Email and password login service. This is dealt with on the react frontend -> https://github.com/Design-Group-14/Backend
+We are also using Firebase for authentication using their Email and password login service. This is dealt with on the react frontend -> https://github.com/Design-Group-14/Frontend
 
 
 ## How to Run
