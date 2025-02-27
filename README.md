@@ -9,7 +9,7 @@ We are using a postgreSQL database which is hosted on Aiven Cloud. Data regardin
 We are also using Firebase for authentication using their Email and password login service. This is dealt with on the react frontend -> https://github.com/Design-Group-14/Frontend
 
 
-## How to Run
+## Step by Step
 You will need Python and Pip installed
 
 #### Steps
