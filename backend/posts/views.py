@@ -58,13 +58,17 @@ def create_post(request):
 @require_http_methods(["GET"])
 def get_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
-    return JsonResponse({
+    response = JsonResponse({
         'id': post.id,
         'user': post.user.email if hasattr(post.user, 'email') else post.user.username,
         'content': post.content,
         'image_url': post.image_url,
         'created_at': post.created_at
     })
+    response["Access-Control-Allow-Origin"] = "*"
+    response["Access-Control-Allow-Methods"] = "GET, OPTIONS"
+    response["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+    return response
 
 @csrf_exempt
 @login_required
