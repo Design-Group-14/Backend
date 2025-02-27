@@ -1,11 +1,13 @@
-from django.shortcuts import render
-from django.shortcuts import get_object_or_404
+from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 import json
 from .models import Post
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 @require_http_methods(["GET"])
 def list_posts(request):
@@ -17,7 +19,7 @@ def list_posts(request):
     posts = Post.objects.all()[start:end]
     post_list = [{
         'id': post.id,
-        'user': post.user.email,
+        'user': post.user.email if hasattr(post.user, 'email') else post.user.username,
         'content': post.content,
         'image_url': post.image_url,
         'created_at': post.created_at
@@ -58,7 +60,7 @@ def get_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     return JsonResponse({
         'id': post.id,
-        'user': post.user.email,
+        'user': post.user.email if hasattr(post.user, 'email') else post.user.username,
         'content': post.content,
         'image_url': post.image_url,
         'created_at': post.created_at
@@ -85,4 +87,3 @@ def delete_post(request, post_id):
     post = get_object_or_404(Post, id=post_id, user=request.user)
     post.delete()
     return JsonResponse({'message': 'Post deleted successfully'})
-
