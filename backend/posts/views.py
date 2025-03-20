@@ -20,9 +20,12 @@ def list_posts(request):
     post_list = [{
         'id': post.id,
         'user': post.user.email if hasattr(post.user, 'email') else post.user.username,
+        'title': post.title,
         'content': post.content,
         'image_url': post.image_url,
-        'created_at': post.created_at
+        'created_at': post.created_at,
+        'latitude': post.latitude,
+        'longitude': post.longitude
     } for post in posts]
 
     return JsonResponse({
@@ -38,20 +41,29 @@ def list_posts(request):
 def create_post(request):
     try:
         data = json.loads(request.body)
+
         post = Post.objects.create(
             user=request.user,
+            title=data.get('title', 'Untitled Post'),
             content=data['content'],
-            image_url=data.get('image_url', None)
+            image_url=data.get('image_url', None),
+            latitude=data.get('latitude', None), 
+            longitude=data.get('longitude', None)
         )
+
         return JsonResponse({
             'message': 'Post created successfully',
             'post': {
                 'id': post.id,
+                'title': post.title,
                 'content': post.content,
                 'image_url': post.image_url,
+                'latitude': post.latitude,
+                'longitude': post.longitude,
                 'created_at': post.created_at
             }
         }, status=201)
+
     except KeyError as e:
         return JsonResponse({'error': f'Missing required field: {str(e)}'}, status=400)
 
@@ -61,8 +73,11 @@ def get_post(request, post_id):
     response = JsonResponse({
         'id': post.id,
         'user': post.user.email if hasattr(post.user, 'email') else post.user.username,
+        'title': post.title,
         'content': post.content,
         'image_url': post.image_url,
+        'latitude': post.latitude,
+        'longitude': post.longitude,
         'created_at': post.created_at
     })
     response["Access-Control-Allow-Origin"] = "*"
@@ -76,10 +91,17 @@ def get_post(request, post_id):
 def update_post(request, post_id):
     post = get_object_or_404(Post, id=post_id, user=request.user)
     data = json.loads(request.body)
+
+    if 'title' in data:
+        post.title = data['title']
     if 'content' in data:
         post.content = data['content']
     if 'image_url' in data:
         post.image_url = data['image_url']
+    if 'latitude' in data:
+        post.latitude = data['latitude']
+    if 'longitude' in data:
+        post.longitude = data['longitude']
     
     post.save()
     return JsonResponse({'message': 'Post updated successfully'})
@@ -91,3 +113,5 @@ def delete_post(request, post_id):
     post = get_object_or_404(Post, id=post_id, user=request.user)
     post.delete()
     return JsonResponse({'message': 'Post deleted successfully'})
+
+
