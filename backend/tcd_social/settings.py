@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'posts',
     'user_auth',
     'django_extensions',
-    'users.apps.UsersConfig',
+    # 'users.apps.UsersConfig',
 ]
 
 MIDDLEWARE = [
@@ -112,8 +112,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Set the custom user model
 AUTH_USER_MODEL = 'user_auth.User'
-
-AUTH_USER_MODEL = 'users.User'
 
 
 # Internationalization
