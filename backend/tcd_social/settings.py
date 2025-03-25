@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'posts',
-    'user_auth',  # Add the user_auth app
+    'user_auth',
 ]
 
 MIDDLEWARE = [

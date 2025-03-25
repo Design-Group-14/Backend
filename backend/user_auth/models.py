@@ -17,7 +17,7 @@ class User(AbstractUser):
     graduation_year = models.IntegerField(
         validators=[
             MinValueValidator(1900),
-            MaxValueValidator(2100)
+            MaxValueValidator(datetime.now().year + 10)  # Allow a reasonable range
         ],
         null=True,
         blank=True
@@ -28,7 +28,7 @@ class User(AbstractUser):
 
     # Make email the required field for login instead of username
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
+    REQUIRED_FIELDS = []
 
     class Meta:
         verbose_name = _('user')
