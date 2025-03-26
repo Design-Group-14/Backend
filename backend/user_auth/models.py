@@ -28,7 +28,7 @@ class User(AbstractUser):
 
     # Make email the required field for login instead of username
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ['username']
 
     class Meta:
         verbose_name = _('user')
