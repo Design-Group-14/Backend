@@ -16,4 +16,3 @@ class Post(models.Model):
 
     def __str__(self):
         return f"Post {self.title} by {self.user.email} at {self.created_at}"
-
