@@ -25,14 +25,13 @@ SECRET_KEY = 'django-insecure-p15@x5%!ta4+vs!jysw#*d@4m#20fz$*((a-bi04hdae=#(e-v
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS").split(",")
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Application definition
 
 INSTALLED_APPS = [
-    'corsheaders',  
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -84,7 +83,7 @@ DATABASES = {
      'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'defaultdb',
-        'USER': 'avnadmin', 
+        'USER': 'avnadmin',
         'PASSWORD': 'AVNS_LJfu-uwOZzhjWJGlmVO',
         'HOST': 'belltower-2025-belltower-2025.g.aivencloud.com',
         'PORT': '12608',
