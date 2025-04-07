@@ -98,6 +98,79 @@ def get_post(request, post_id):
     return response
 
 @csrf_exempt
+@require_http_methods(["POST"])
+def create_post(request):
+    try:
+        data = json.loads(request.body)
+
+       
+        user_email = data.get("email")
+
+        if user_email:
+            user = User.objects.filter(email=user_email).first()
+            if not user:
+                return JsonResponse({'error': f'User with email {user_email} not found'}, status=404)
+        else:
+           
+            user = request.user
+            if not user.is_authenticated:
+                try:
+                    user = User.objects.get(email="sultan@gmail.com")
+                except User.DoesNotExist:
+                    user = User.objects.first()
+                    if not user:
+                        return JsonResponse({'error': 'No users in the system'}, status=400)
+
+        
+        post = Post.objects.create(
+            user=user,
+            title=data.get('title', 'Untitled Post'),
+            content=data['content'],
+            image_url=data.get('image_url', None),
+            latitude=data.get('latitude', None), 
+            longitude=data.get('longitude', None)
+        )
+
+        return JsonResponse({
+            'message': 'Post created successfully',
+            'post': {
+                'id': post.id,
+                'title': post.title,
+                'content': post.content,
+                'image_url': post.image_url,
+                'latitude': post.latitude,
+                'longitude': post.longitude,
+                'created_at': post.created_at
+            }
+        }, status=201)
+
+    except KeyError as e:
+        return JsonResponse({'error': f'Missing required field: {str(e)}'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+    
+@require_http_methods(["GET"])
+def get_user_posts(request, email):
+    try:
+        user = User.objects.get(email=email)
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'User not found'}, status=404)
+
+    posts = Post.objects.filter(user=user).order_by('-created_at')
+    post_list = [{
+        'id': post.id,
+        'title': post.title,
+        'content': post.content,
+        'image_url': post.image_url,
+        'latitude': post.latitude,
+        'longitude': post.longitude,
+        'created_at': post.created_at,
+    } for post in posts]
+
+    return JsonResponse({'posts': post_list}, safe=False)
+
+
+@csrf_exempt
 @login_required
 @require_http_methods(["PUT", "PATCH"])
 def update_post(request, post_id):
@@ -124,6 +197,4 @@ def update_post(request, post_id):
 def delete_post(request, post_id):
     post = get_object_or_404(Post, id=post_id, user=request.user)
     post.delete()
-    return JsonResponse({'message': 'Post deleted successfully'})
-
-
+    return JsonResponse({'message': 'Post deleted successfully'})        
