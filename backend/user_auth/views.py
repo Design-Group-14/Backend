@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 import json
 from .models import User
+from django.db import models
 
 # Create your views here.
 
@@ -44,27 +45,85 @@ def register_user(request):
 
 @require_http_methods(["GET"])
 def list_users(request):
-    """List all users (with pagination)"""
-    page = int(request.GET.get('page', 1))
-    per_page = int(request.GET.get('per_page', 10))
-    start = (page - 1) * per_page
-    end = start + per_page
-    
-    users = User.objects.all()[start:end]
-    user_list = [{
-        'id': user.id,
-        'username': user.username,
-        'email': user.email,
-        'course_name': user.course_name,
-        'country': user.country
-    } for user in users]
-    
-    return JsonResponse({
-        'users': user_list,
-        'page': page,
-        'per_page': per_page,
-        'total': User.objects.count()
-    })
+    """List all users with pagination, filtering, and sorting"""
+    try:
+        # Pagination parameters
+        page = int(request.GET.get('page', 1))
+        per_page = int(request.GET.get('per_page', 10))
+        start = (page - 1) * per_page
+        end = start + per_page
+
+        # Filtering parameters
+        course_filter = request.GET.get('course')
+        country_filter = request.GET.get('country')
+        search_query = request.GET.get('search')
+
+        # Sorting parameters
+        sort_by = request.GET.get('sort_by', 'id')
+        sort_order = request.GET.get('sort_order', 'asc')
+
+        # Base query
+        users_query = User.objects.all()
+
+        # Apply filters
+        if course_filter:
+            users_query = users_query.filter(course_name__iexact=course_filter)
+        if country_filter:
+            users_query = users_query.filter(country__iexact=country_filter)
+        if search_query:
+            users_query = users_query.filter(
+                models.Q(username__icontains=search_query) |
+                models.Q(email__icontains=search_query) |
+                models.Q(first_name__icontains=search_query) |
+                models.Q(last_name__icontains=search_query)
+            )
+
+        # Apply sorting
+        if sort_order.lower() == 'desc':
+            sort_by = f'-{sort_by}'
+        users_query = users_query.order_by(sort_by)
+
+        # Get paginated results
+        total_users = users_query.count()
+        users = users_query[start:end]
+
+        # Format user data
+        user_list = [{
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'course_name': user.course_name,
+            'country': user.country,
+            'graduation_year': user.graduation_year,
+            'date_joined': user.date_joined,
+            'last_login': user.last_login,
+            'is_active': user.is_active
+        } for user in users]
+
+        return JsonResponse({
+            'users': user_list,
+            'pagination': {
+                'page': page,
+                'per_page': per_page,
+                'total': total_users,
+                'total_pages': (total_users + per_page - 1) // per_page
+            },
+            'filters': {
+                'course': course_filter,
+                'country': country_filter,
+                'search': search_query
+            },
+            'sorting': {
+                'sort_by': sort_by.lstrip('-'),
+                'sort_order': sort_order
+            }
+        })
+    except ValueError as e:
+        return JsonResponse({'error': 'Invalid parameter value'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
 
 @require_http_methods(["GET"])
 def get_user(request, user_id):
