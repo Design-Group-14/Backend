@@ -25,7 +25,8 @@ def list_posts(request):
         'image_url': post.image_url,
         'created_at': post.created_at,
         'latitude': post.latitude,
-        'longitude': post.longitude
+        'longitude': post.longitude,
+        'location': post.location  # ✅ keep user-written location
     } for post in posts]
 
     return JsonResponse({
@@ -34,50 +35,6 @@ def list_posts(request):
         'per_page': per_page,
         'total': Post.objects.count()
     })
-
-@csrf_exempt
-@require_http_methods(["POST"])
-def create_post(request):
-    try:
-        data = json.loads(request.body)
-        
-        # For testing, use sultan@gmail.com as the default user if not authenticated
-        user = request.user
-        if not user.is_authenticated:
-            User = get_user_model()
-            try:
-                # Try to get sultan@gmail.com user
-                user = User.objects.get(email="sultan@gmail.com")
-            except User.DoesNotExist:
-                # Fallback to the first user
-                user = User.objects.first()
-                if not user:
-                    return JsonResponse({'error': 'No users in the system'}, status=400)
-
-        post = Post.objects.create(
-            user=user,
-            title=data.get('title', 'Untitled Post'),
-            content=data['content'],
-            image_url=data.get('image_url', None),
-            latitude=data.get('latitude', None), 
-            longitude=data.get('longitude', None)
-        )
-
-        return JsonResponse({
-            'message': 'Post created successfully',
-            'post': {
-                'id': post.id,
-                'title': post.title,
-                'content': post.content,
-                'image_url': post.image_url,
-                'latitude': post.latitude,
-                'longitude': post.longitude,
-                'created_at': post.created_at
-            }
-        }, status=201)
-
-    except KeyError as e:
-        return JsonResponse({'error': f'Missing required field: {str(e)}'}, status=400)
 
 @require_http_methods(["GET"])
 def get_post(request, post_id):
@@ -90,6 +47,7 @@ def get_post(request, post_id):
         'image_url': post.image_url,
         'latitude': post.latitude,
         'longitude': post.longitude,
+        'location': post.location,  # ✅ added
         'created_at': post.created_at
     })
     response["Access-Control-Allow-Origin"] = "*"
@@ -103,7 +61,6 @@ def create_post(request):
     try:
         data = json.loads(request.body)
 
-       
         user_email = data.get("email")
 
         if user_email:
@@ -111,7 +68,6 @@ def create_post(request):
             if not user:
                 return JsonResponse({'error': f'User with email {user_email} not found'}, status=404)
         else:
-           
             user = request.user
             if not user.is_authenticated:
                 try:
@@ -121,14 +77,14 @@ def create_post(request):
                     if not user:
                         return JsonResponse({'error': 'No users in the system'}, status=400)
 
-        
         post = Post.objects.create(
             user=user,
             title=data.get('title', 'Untitled Post'),
             content=data['content'],
             image_url=data.get('image_url', None),
-            latitude=data.get('latitude', None), 
-            longitude=data.get('longitude', None)
+            latitude=data.get('latitude', None),
+            longitude=data.get('longitude', None),
+            location=data.get('location', None)  # ✅ store user-written location
         )
 
         return JsonResponse({
@@ -140,6 +96,7 @@ def create_post(request):
                 'image_url': post.image_url,
                 'latitude': post.latitude,
                 'longitude': post.longitude,
+                'location': post.location,
                 'created_at': post.created_at
             }
         }, status=201)
@@ -148,7 +105,7 @@ def create_post(request):
         return JsonResponse({'error': f'Missing required field: {str(e)}'}, status=400)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
-    
+
 @require_http_methods(["GET"])
 def get_user_posts(request, email):
     try:
@@ -164,11 +121,11 @@ def get_user_posts(request, email):
         'image_url': post.image_url,
         'latitude': post.latitude,
         'longitude': post.longitude,
+        'location': post.location,  # ✅ added
         'created_at': post.created_at,
     } for post in posts]
 
     return JsonResponse({'posts': post_list}, safe=False)
-
 
 @csrf_exempt
 @login_required
@@ -187,7 +144,9 @@ def update_post(request, post_id):
         post.latitude = data['latitude']
     if 'longitude' in data:
         post.longitude = data['longitude']
-    
+    if 'location' in data:
+        post.location = data['location']  # ✅ added
+
     post.save()
     return JsonResponse({'message': 'Post updated successfully'})
 
@@ -197,4 +156,4 @@ def update_post(request, post_id):
 def delete_post(request, post_id):
     post = get_object_or_404(Post, id=post_id, user=request.user)
     post.delete()
-    return JsonResponse({'message': 'Post deleted successfully'})        
+    return JsonResponse({'message': 'Post deleted successfully'})
