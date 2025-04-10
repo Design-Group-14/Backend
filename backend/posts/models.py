@@ -19,3 +19,22 @@ class Post(models.Model):
         return f"Post {self.title} by {self.user.email} at {self.created_at}"
 
 
+# ✅ NEW: Follow model
+class Follow(models.Model):
+    follower = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='following_set'
+    )
+    followed = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='followers_set'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('follower', 'followed')  # prevent duplicate follows
+
+    def __str__(self):
+        return f"{self.follower.email} follows {self.followed.email}"

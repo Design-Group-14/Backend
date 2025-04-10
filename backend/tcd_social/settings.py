@@ -80,13 +80,18 @@ WSGI_APPLICATION = 'tcd_social.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-     'default': {
+    'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'defaultdb',
         'USER': 'avnadmin',
         'PASSWORD': 'AVNS_LJfu-uwOZzhjWJGlmVO',
         'HOST': 'belltower-2025-belltower-2025.g.aivencloud.com',
         'PORT': '12608',
+        'OPTIONS': {
+            'connect_timeout': 10,
+            'sslmode': 'require',
+        },
+        'CONN_MAX_AGE': 0, 
     }
 }
 
